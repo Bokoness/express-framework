@@ -1,20 +1,26 @@
 import Vue from "vue"
 import VueRouter from "vue-router"
+import store from "./../store/index"
 import Login from "../views/Login.vue"
-import DashboardUserCold from "../views/DashboardUserCold.vue"
-import DashboardAdmin from "../views/DashboardAdmin.vue"
-import DashboardUser from "../views/Dashboard.vue"
-import TodoPage from "../views/EventUser.vue"
-import EventAdmin from "@/views/EventAdmin.vue"
-import store from "@/store"
+import NotFound from "../views/NotFound.vue"
+import Dashboard from "@/views/Dashboard"
 
 Vue.use(VueRouter)
 
-const LoginGuard = (to, from, next) => {
-  if (!store.getters.isAuth) {
-    return to.name === "Login" ? next() : next({name: "Login"})
-  }
-  return next({name: "DashboardUserCold"})
+const authGuard = async (to, from, next) => {
+  const isAuth = store.getters.isAuth
+  if (!isAuth) return next({name: "Login"})
+
+  const userRole = store.getters.role
+  const routeRoles = to.meta?.roles
+  if (!routeRoles || routeRoles.includes(userRole)) return next()
+
+  return next({name: "NotFound"})
+}
+
+const beforeEnterLoginPage = async (to, from, next) => {
+  const isAuth = store.getters.isAuth
+  return isAuth ? next({name: "Bids"}) : next()
 }
 
 const routes = [
@@ -22,38 +28,20 @@ const routes = [
     path: "/",
     name: "Login",
     component: Login,
-    beforeEnter: LoginGuard,
+    beforeEnter: beforeEnterLoginPage,
   },
   {
-    path: "/dashboard-admin",
-    name: "DashboardAdmin",
-    component: DashboardAdmin,
+    path: "/dashboard",
+    name: "Dashboard",
+    component: Dashboard,
+    beforeEnter: authGuard,
   },
   {
-    path: "/event-admin",
-    name: "EventAdmin",
-    component: EventAdmin,
-  },
-  {
-    path: "/dashboard-user",
-    name: "DashboardUser",
-    component: DashboardUser,
-  },
-  {
-    path: "/dashboard-user-cold",
-    name: "DashboardUserCold",
-    component: DashboardUserCold,
-  },
-  {
-    path: "/todo/:category",
-    name: "TodoPage",
-    component: TodoPage,
-  },
-  {
-    path: "/*",
+    path: "*",
     name: "NotFound",
-    redirect: "/",
-  }
+    component: NotFound,
+    meta: {roles: [0, 1, 2, 3, 4, 5]},
+  },
 ]
 
 const router = new VueRouter({
@@ -61,24 +49,5 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
 })
-router.beforeResolve((to, from, next) => {
-  const isWarm = store.getters.events.length
-  const isAuth = store.getters.isAuth
 
-  if (!isAuth) {
-    return to.name === "Login" ? next() : next({name: "Login"})
-  }
-
-  if (to.name.includes("DashboardUser")) {
-    if (isWarm) {
-      return to.name === "DashboardUser"
-        ? next()
-        : next({name: "DashboardUser"})
-    }
-    return to.name === "DashboardUserCold"
-      ? next()
-      : next({name: "DashboardUserCold"})
-  }
-  return next()
-})
 export default router

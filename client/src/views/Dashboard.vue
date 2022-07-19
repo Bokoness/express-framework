@@ -9,6 +9,6 @@ export default {
   name: "DashboardPage",
   data() {
     return {   }
-    }
   }
+}
 </script>

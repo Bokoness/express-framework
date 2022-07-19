@@ -1,6 +1,8 @@
 const he = {
   appTitle: 'צח"י',
   generics: {
+    hello: 'שלום',
+    notFound: 'לא נמצא',
     level: "רמה",
     totalScore: "סך כל הנקודות",
     score: "ניקוד | נקודות",
@@ -185,6 +187,13 @@ const he = {
     waiting: "ממתין לתשלום",
     "in-progress": "בהכנה",
     done: "מוכן",
+  },
+  toasts: {
+    error: "אירעה שגיאה",
+    success: "הפעולה הושלמה",
+    successStore: "היצירה הושלמה",
+    successUpdate: "העריכה הושלמה",
+    successDestroy: "המחיקה הושלמה",
   },
 }
 export default he

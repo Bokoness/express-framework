@@ -53,7 +53,7 @@ class AuthServices {
   static getUser(user) {
     // TODO: change here to wanted fields;
     return {
-      fullname: user.fullname,
+      fullName: user.fullName,
       email: user.email,
       role: user.role,
     }
